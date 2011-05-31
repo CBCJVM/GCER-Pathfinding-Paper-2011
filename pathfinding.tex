@@ -1,3 +1,7 @@
+% This document is available under the GNU Free Documentation License
+% Copyright (C) 2011 --- Benjamin Woodruff
+% See the file LICENSE for copying conditions.
+
 \documentclass[letterpaper, 12pt]{article}
 
 \usepackage[in]{fullpage}
@@ -5,10 +9,13 @@
 \usepackage{mdwlist}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage{tabularx}
-\usepackage{multirow}
+\usepackage[american]{babel} 
+\usepackage{biblatex}
 
 \pagestyle{empty}
+\defbibheading{blank}{}
+
+\addbibresource{citations.bib}
 
 \begin{document}
 
@@ -46,22 +53,26 @@ such paths, and putting things into practice.
 
 \subsection{An Example Problem}
 
-Imagine you have a movement library, such as CBCJVM's, that allows for simple
-geometric movements, as well as position tracking. The robot successfully finds
-a set of blocks with it's camera, but now you have to figure out how to navigate
-back to your drop-off point. There's a few simple answers, such as reversing the
-movements that you took to get the blocks, returning you to a known point, but
-all of these are inefficient. If you try to simply move from one point to
-another, using position tracking, you have no easy way of handling if there is
-an object in the way of your path.
+Imagine you have a movement library, such as CBCJVM's \cite{cbcjvm2010}, that
+allows for simple geometric movements and position tracking \footnote{With the
+right calculations, as long as all your motions happen through a single movement
+library, you should be able to dynamically determine exactly where you are at
+any point in time}. The robot successfully finds a set of blocks with it's
+camera, but now you have to figure out how to navigate back to your drop-off
+point. There's a few simple answers, such as reversing the movements that you
+took to get the blocks, returning you to a known point, but all of these are
+inefficient. If you try to simply move from one point to another, using position
+tracking, you have no easy way of handling if there is an object in the way of
+your path.
 
 \subsection{How Pathfinding can Help}
 
 A proper path-finding system already knows the layout of obstacles on the board,
 either through static (programmer) input, or through dynamically (sensor)
 inputted information. With this, the system should be able to determine the best
-way to get from Point A to Point B, avoiding everything else in-between. This
-can then be distilled into a simple set of actions, such as
+way to get from Point A to Point B, avoiding everything else
+in-between \cite{wikipathfinding}. This can then be distilled into a simple set
+of actions, such as
 
 \begin{enumerate*}
     \item Rotate 37 degrees clockwise
@@ -77,7 +88,10 @@ can then be distilled into a simple set of actions, such as
 The typical way of solving such a problem, as has been done by teams such as
 Norman High School in the past, has been to turn the board into a grid, and to
 utilize the simple A* algorithm to then generate a path on the grid. Such a path
-is then traced and turned into a set of movements, like above.
+is then traced and turned into a set of movements, like above. Unfortunately a
+specific description of the algorithm is beyond the scope of this document, but
+there is a plethora of places, online and otherwise, to find such a description.
+\cite{wikiastar}
 
 However, such a system works in a non-optimal manner. Our robots do not operate
 on a grid, and, as a result, the generated paths can end up including far more
@@ -108,12 +122,12 @@ reduces our search-space.
 As obvious as it seems to us that the robot cannot simply pass through pvc-pipe
 (excluding robots with treads or other advance apparatuses), we must define such
 in our algorithm. The obvious way of doing such is to declare that from one
-node, the only other directly accessible nodes are those within the line-of-
-sight of the current node.
+node, the only other directly accessible nodes are those within the
+line-of-sight of the current node.
 
 Looking around, there don't seem to be many good published line-of-sight
-algorithms for our purposes. Most, often for graphical setups, deal with pixel-
-level, or grid-based systems.
+algorithms for our purposes. Most, often for graphical setups, deal with
+pixel-level, or grid-based systems.
 
 As a result, I attempted, with quite some success, a na\"ive technique, derived
 from ray-tracing systems.
@@ -147,8 +161,12 @@ view-point, we can have each of our objects send emit rays back towards the
 view-point, instead of the other way around, hence the algorithm's name. Along
 the way, they can collide with other objects and such, but not near as many rays
 are wasted, and such an algorithm is now far from brute-force. Such an algorithm
-is typically \(\mathrm{O}(n)\), where \(n\) is the number of objects in the
-field.
+is typically \(\mathrm{O}(n)\)\footnote{This is known as Big-O notation. It
+relates the execution time of an algorithm to the size of the dataset provided.
+It is purely about proportionality. \(\mathrm{O}(n)\) means that the execution
+time is directly proportional to the data size, \(n\). Big-O notation is useful
+because it makes the bold statement that performance only matters as a system of
+scale.}, where \(n\) is the number of objects on the field.
 
 \subsubsection{Lighting up the Board}
 
@@ -182,7 +200,7 @@ from your system, these a few notes can be of use when optimizing.
 Dijkstra's Algorithm is an extremely popular algorithm, excellent for deducing
 perfectly optimal paths in a variety of situations, and for it's design, it has
 been proven mathematically optimal in terms of performance, executing in
-\(\mathrm{O}\left(n^2\right)\) time, where \(n\) is the number of vertices, or
+\(\mathrm{O}\!\left(n^2\right)\) time, where \(n\) is the number of vertices, or
 nodes. It has been used for both the obvious, such as in navigation systems, to
 the not-so-obvious, such as phone-call routing.
 
@@ -291,22 +309,23 @@ expand each polygon is as follows:
 
 \begin{enumerate}
 
-\item For each line segment, find it the slope of a line perpendicular to it
-      (find the negative inverse, \(-\frac{\Delta x}{\Delta y}\)).
-\item Find a point on the original line segment.
-\item Using the point and perpendicular slope, derive a line segment extending
-      from a (any) point on the original line segment outward\footnote{You can
-      easily determine what way is outward if the polygon's points are in a
-      known order, such as clockwise or counter-clockwise}, with a length equal
-      to the desired outset distance.
-\item Take the second point of the newly formed line-segment. Form an infinitely
-      extending line that passes through that second point with the slope of the
-      original line segment (a parallel line).
-\item Once you have these parallel lines for each edge of the base polygon, find
-      the intersection points\footnote{To do this, think back to algebra, where
-      you set one equation equal to the other and solved} for the lines
-      corresponding to consecutive edges on the base polygon. The new polygon
-      can be formed from these intersection points.
+    \item For each line segment, find it the slope of a line perpendicular to it
+          (find the negative inverse, \(-\frac{\Delta x}{\Delta y}\)).
+    \item Find a point on the original line segment.
+    \item Using the point and perpendicular slope, derive a line segment
+          extending from a (any) point on the original line segment outward
+          \footnote{You can easily determine what way is outward if the
+          polygon's points are in a known order, such as clockwise or
+          counter-clockwise}, with a length equal to the desired outset
+          distance.
+    \item Take the second point of the newly formed line-segment. Form an
+          infinitely extending line that passes through that second point with
+          the slope of the original line segment (a parallel line).
+    \item Once you have these parallel lines for each edge of the base polygon,
+          find the intersection points\footnote{To do this, think back to
+          algebra, where you set one equation equal to the other and solved} for
+          the lines corresponding to consecutive edges on the base polygon. The
+          new polygon can be formed from these intersection points.
 
 \end{enumerate}
 
@@ -340,10 +359,10 @@ The system that we ended up using was a rather blunt one.
 
 Polygon triangulation refers to a common practice in graphics programming by
 which one takes an arbitrary polygon, convex\footnote{A polygon that only has
-outward facing vertices, an example being any ``regular'' polygon.} or concave
-\footnote{A polygon that ``caves'' in upon itself.}, and turns it into a set of
-triangles. This is done simply because triangles tend to be easier to work with,
-as far more assumptions can be made about them.
+outward facing vertices, an example being any \textit{regular} polygon.} or
+concave \footnote{A polygon that ``caves'' in upon itself.}, and turns it into a
+set of triangles. This is done simply because triangles tend to be easier to
+work with, as far more assumptions can be made about them.
 
 There are a variety of ways of performing such a task, some easy, some complex.
 Rather than implementing our own system, we managed to procure a piece of Java
@@ -377,7 +396,7 @@ and CPython 3.1 and up\footnote{The Python 2.x and 3.x series are not entirely
 compatible however they share many similarities, such that if one is careful,
 they can support both with the same code-base. Python 3.x is meant to replace
 the 2.x series, but both are currently supported by the Python Software
-Foundation, and both are in common use}. Other versions and implementations
+Foundation, and both are in common use.}. Other versions and implementations
 should work, but simply have not been tested.
 
 The implicitly static nature of the design, and the use but lack of dependence
@@ -402,6 +421,21 @@ year's robots all the more interesting.
 
 Keep Hacking!
 
+\section{Works Cited}
+
+\printbibliography[heading=blank]
+
 \end{multicols}
+
+\vfill
+
+\begin{footnotesize}
+    This paper can be found online along with it's editing history and it's
+    \LaTeX \ and \texttt{SVG} sources at
+    \url{https://github.com/CBCJVM/GCER-Pathfinding-Paper-2011} (See the
+    downloads button for a \texttt{PDF} version). This paper has been made
+    available under the terms of the GNU Free Documentation License. Licensing
+    information is available at the above link.
+\end{footnotesize}
 
 \end{document}

@@ -14,4 +14,6 @@ such paths, and putting things into practice.
 Building
 --------
 
-``rubber -d pathfinding.tex``
+We used to use rubber in form of ``rubber -d pathfinding.tex``, however rubber
+does not support biblatex, so instead, you should use latexmk, in the form of
+``latexmk -pdf pathfinding.tex``, which does the job.
