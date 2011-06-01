@@ -9,7 +9,8 @@
 \usepackage{mdwlist}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage[american]{babel} 
+\usepackage[american]{babel}
+\usepackage{csquotes}
 \usepackage{biblatex}
 
 \pagestyle{empty}
@@ -54,16 +55,16 @@ such paths, and putting things into practice.
 \subsection{An Example Problem}
 
 Imagine you have a movement library, such as CBCJVM's \cite{cbcjvm2010}, that
-allows for simple geometric movements and position tracking \footnote{With the
+allows for simple geometric movements and position tracking\footnote{With the
 right calculations, as long as all your motions happen through a single movement
 library, you should be able to dynamically determine exactly where you are at
-any point in time}. The robot successfully finds a set of blocks with it's
-camera, but now you have to figure out how to navigate back to your drop-off
-point. There's a few simple answers, such as reversing the movements that you
-took to get the blocks, returning you to a known point, but all of these are
-inefficient. If you try to simply move from one point to another, using position
-tracking, you have no easy way of handling if there is an object in the way of
-your path.
+any point in time.} \cite{cbcjvmposition}. The robot successfully finds a set of
+blocks with it's camera, but now you have to figure out how to navigate back to
+your drop-off point. There's a few simple answers, such as reversing the
+movements that you took to get the blocks returning you to a known point, but
+all of these are inefficient. If you try to simply move from one point to
+another, using position tracking, you have no easy way of handling if there is
+an object in the way of your path.
 
 \subsection{How Pathfinding can Help}
 
@@ -112,10 +113,13 @@ a group of lines, sharing nodes at vertices form polygons. The board can be
 represented through a set of inaccessible polygon areas, and otherwise open
 area.
 
-When you are forming an optimal path, assuming the robot itself is a point-mass,
-the only nodes included in the path will be the starting point, the ending
-point, and the vertices of the polygons on the map. This assumption greatly
-reduces our search-space.
+When you are forming an optimal path, assuming the robot itself is a
+point-mass\footnote{The robot is treated as infinitely small: as though it has
+no radius. This is not accurate, but it makes working with things easier, and as
+is pointed out later in this paper, we can make up for this with some polygon
+expansion.}, the only nodes included in the path will be the starting point, the
+ending point, and the vertices of the polygons on the map. This assumption
+greatly reduces our search-space.
 
 \subsection{Line-of-Sight}
 
@@ -127,24 +131,24 @@ line-of-sight of the current node.
 
 Looking around, there don't seem to be many good published line-of-sight
 algorithms for our purposes. Most, often for graphical setups, deal with
-pixel-level, or grid-based systems.
+pixel-level, or grid-based systems. \cite{tilelos}
 
-As a result, I attempted, with quite some success, a na\"ive technique, derived
-from ray-tracing systems.
+As a result, I attempted, with some success, a na\"ive technique, derived from
+ray-tracing systems.
 
 \subsubsection{Ray-Tracing}
 
 Ray-tracing is a common technique for high quality 3d rendering, and such
 algorithms lay at the center of multi-million dollar programs, such as Pixar's
 Renderman software, used in countless Disney-Pixar flicks, as well as a wide
-variety of other Hollywood blockbusters.
+variety of other Hollywood blockbusters. \cite{renderman}
 
 The algorithm is a near brute-force approach at mimicking mother-nature. We can
 pretend that the sun, instead of sending out continuous particle-waves, sends
 out countless numbers of rays, which follow rules of refraction. Some of these
 end up in our view, others don't. The density of returned ``rays'' per unit area
 (per pixel) determines the resultant brightness. If rays don't get to a certain
-area, we end up with shadows (See where we're going?).
+area, we end up with shadows (See where we're going?). \cite{radraytrace}
 
 \subsubsection{Reverse Ray-Tracing}
 
@@ -160,13 +164,14 @@ as ideal. If, for example, the light-source is located at the same point as the
 view-point, we can have each of our objects send emit rays back towards the
 view-point, instead of the other way around, hence the algorithm's name. Along
 the way, they can collide with other objects and such, but not near as many rays
-are wasted, and such an algorithm is now far from brute-force. Such an algorithm
-is typically \(\mathrm{O}(n)\)\footnote{This is known as Big-O notation. It
-relates the execution time of an algorithm to the size of the dataset provided.
-It is purely about proportionality. \(\mathrm{O}(n)\) means that the execution
-time is directly proportional to the data size, \(n\). Big-O notation is useful
-because it makes the bold statement that performance only matters as a system of
-scale.}, where \(n\) is the number of objects on the field.
+are wasted, and such an algorithm is now far from brute-force.
+\cite{wikiraytrace} Such an algorithm is typically \(\mathrm{O}(n)\), where
+\(n\) is the number of objects on the field\footnote{This is known as Big-O
+notation. It relates the execution time of an algorithm to the size of the
+dataset provided. It is purely about proportionality. \(\mathrm{O}(n)\) means
+that the execution time is directly proportional to the data size, \(n\). Big-O
+notation is useful because it makes the bold statement that performance only
+matters as a system of scale.}.
 
 \subsubsection{Lighting up the Board}
 
@@ -190,27 +195,28 @@ from your system, these a few notes can be of use when optimizing.
 
 \begin{itemize}
     \item Visibility is mutual, meaning that if one point is visible from the
-          other, the opposite must be true.
-    \item If a board is statically laid out, visibility never changes, an so
+          other, the opposite must be true. \cite{wikiraytrace}
+    \item If a board is statically laid out, visibility never changes, and so
           such results can be cached.
 \end{itemize}
 
 \subsection{Dijkstra's Algorithm}
 
-Dijkstra's Algorithm is an extremely popular algorithm, excellent for deducing
-perfectly optimal paths in a variety of situations, and for it's design, it has
-been proven mathematically optimal in terms of performance, executing in
-\(\mathrm{O}\!\left(n^2\right)\) time, where \(n\) is the number of vertices, or
-nodes. It has been used for both the obvious, such as in navigation systems, to
-the not-so-obvious, such as phone-call routing.
+Dijkstra's\footnote{The name is a Dutch one. Interestingly, it is pronounced
+``dike-struh''\cite{dikestruh}} Algorithm is an extremely popular algorithm,
+excellent for deducing perfectly optimal paths in a variety of situations, and
+for it's design, it has been proven mathematically optimal in terms of
+performance, executing in \(\mathrm{O}\!\left(n^2\right)\) time, where \(n\) is
+the number of vertices, or nodes. It has been used for both the obvious, such as
+in navigation systems, to the not-so-obvious, such as phone-call routing.
 
 Dijkstra's Algorithm works to reduce the ``cost'' of travel. For simplicity
 sake, we only count the cost of translational movement, which parallels the
-distance the robot travels. It's quite possible, and trivial, to modify the
-algorithm to factor in the ``cost'' of rotational movements and the like.
-However, For our example, whenever we say cost, read the distance to travel. As
-Dijkstra's algorithm works in a purely relational manner, the units used don't
-matter.
+distance the robot travels\footnote{A sidenote: as Dijkstra's algorithm works in
+a purely relational manner, the units used don't matter.}. It's quite possible,
+and trivial, to modify the algorithm to factor in the ``cost'' of rotational
+movements and the like. However, for our example, whenever we say cost, read
+``the distance to travel''.
 
 \subsubsection{Pseudo-code}
 
@@ -251,7 +257,7 @@ matter.
 \newcommand{\pyinf}{\(\mathtt{\infty}\)}
 
 Following the above diagram and described algorithm, we can trace the execution
-of such. Data structures will be shown in a Python manner. Specifically, the
+of such. Data structures will be shown in a Pythonic manner. Specifically, the
 dictionary will be expressed in the form \pydict{key=value}, and the list/queue
 will be expressed as \pylist{a, b, c}.
 
