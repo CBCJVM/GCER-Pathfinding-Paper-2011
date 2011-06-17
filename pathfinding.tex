@@ -86,8 +86,7 @@ of actions, such as
 
 \includegraphics[width=\columnwidth]{img/a_star.pdf}
 
-The typical way of solving such a problem, as has been done by teams such as
-Norman High School in the past, has been to turn the board into a grid, and to
+One way of solving such a problem is to turn the board into a grid, and to
 utilize the simple A* algorithm to then generate a path on the grid. Such a path
 is then traced and turned into a set of movements, like above. Unfortunately a
 specific description of the algorithm is beyond the scope of this document, but
@@ -203,7 +202,7 @@ from your system, these a few notes can be of use when optimizing.
 \subsection{Dijkstra's Algorithm}
 
 Dijkstra's\footnote{The name is a Dutch one. Interestingly, it is pronounced
-``dike-struh''\cite{dikestruh}} Algorithm is an extremely popular algorithm,
+``dike-struh'' \cite{dikestruh}} Algorithm is an extremely popular algorithm,
 excellent for deducing perfectly optimal paths in a variety of situations, and
 for it's design, it has been proven mathematically optimal in terms of
 performance, executing in \(\mathrm{O}\!\left(n^2\right)\) time, where \(n\) is
@@ -218,7 +217,7 @@ and trivial, to modify the algorithm to factor in the ``cost'' of rotational
 movements and the like. However, for our example, whenever we say cost, read
 ``the distance to travel''.
 
-\subsubsection{Pseudo-code}
+\subsubsection{Pseudo-code \cite{wikidijkstra}}
 
 \begin{enumerate}
     \item Make a dictionary\footnote{A dictionary, or a hash-map or hash-table
@@ -258,8 +257,8 @@ movements and the like. However, for our example, whenever we say cost, read
 
 Following the above diagram and described algorithm, we can trace the execution
 of such. Data structures will be shown in a Pythonic manner. Specifically, the
-dictionary will be expressed in the form \pydict{key=value}, and the list/queue
-will be expressed as \pylist{a, b, c}.
+dictionary will be expressed in the form \pydict{key=value} \cite{pydicts}, and
+the list/queue will be expressed as \pylist{a, b, c} \cite{pylists}.
 
 \begin{enumerate}
     \item Our dictionary starts as \pydict{a=0, b=\pyinf, c=\pyinf, d=\pyinf}.
@@ -363,12 +362,15 @@ The system that we ended up using was a rather blunt one.
 
 \subsubsection{Polygon Triangulation}
 
+\includegraphics[width=\columnwidth]{img/triangulation.pdf}
+
 Polygon triangulation refers to a common practice in graphics programming by
 which one takes an arbitrary polygon, convex\footnote{A polygon that only has
 outward facing vertices, an example being any \textit{regular} polygon.} or
 concave \footnote{A polygon that ``caves'' in upon itself.}, and turns it into a
 set of triangles. This is done simply because triangles tend to be easier to
 work with, as far more assumptions can be made about them.
+\cite{wikitriangulation}
 
 There are a variety of ways of performing such a task, some easy, some complex.
 Rather than implementing our own system, we managed to procure a piece of Java
@@ -379,6 +381,8 @@ on the \texttt{\#xkcd-cs} irc channel on \texttt{irc.foonetic.net}. (Thanks,
 \texttt{asarkar}!)
 
 \subsubsection{Applying Triangulation to Line-of-Sight}
+
+\includegraphics[width=\columnwidth]{img/triangulation_in_action.pdf}
 
 On top of our prior checks, our system does the following for each polygon on
 the map:
